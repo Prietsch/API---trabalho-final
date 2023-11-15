@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="paises.json" />
+    <title>Exercício 1</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-image: url("https://geo5.net/imagens/bandeira-das-nacoes-unidas-onu.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: 90%;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      h2 {
+        color: #333;
+      }
+
+      select {
+        padding: 10px;
+        border-radius: 10px;
+        border-color: #333;
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      #countryData {
+        width: 40vw;
+        height: 30vh;
+        background-color: #ffffffc7;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      #title {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      p {
+        margin: 10px 0;
+      }
+      #link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="title">
+      <select id="countriesSelect" onchange="fetchCountryData()">
+        <!-- Options will be dynamically added here -->
+      </select>
+    </div>
+    <div id="countryData">
+      <!-- Country data will be displayed here -->
+    </div>
+    <div id="link">
+      <p>
+        link para o exercício 2: <br />
+        <a href="index2.html">exercício 2</a>
+      </p>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", fetchCountries);
+
+      async function fetchCountries() {
+        const response = await fetch("paises.json");
+        const data = await response.json();
+        const countriesSelect = document.getElementById("countriesSelect");
+
+        data.forEach((country) => {
+          const option = new Option(country.nome_pais, country.sigla);
+          countriesSelect.add(option);
+        });
+
+        fetchCountryData(); // Carregar dados do primeiro país por padrão
+      }
+
+      async function fetchCountryData() {
+        const countriesSelect = document.getElementById("countriesSelect");
+        const selectedCountryCode = countriesSelect.value;
+
+        const response = await fetch("paises.json");
+        const data = await response.json();
+
+        const selectedCountry = data.find(
+          (country) => country.sigla === selectedCountryCode
+        );
+
+        displayCountryData(selectedCountry);
+      }
+
+      function displayCountryData(countryData) {
+        const countryDataDiv = document.getElementById("countryData");
+        countryDataDiv.innerHTML = "<h2>Dados do País:</h2>";
+
+        if (countryData) {
+          countryDataDiv.innerHTML += `
+                    <p><strong>Nome:</strong> ${countryData.nome_pais}</p>
+                    <p><strong>Sigla:</strong> ${countryData.sigla}</p>
+                    <p><strong>Gentílico:</strong> ${countryData.gentilico}</p>
+                    <p><strong>Nome Internacional:</strong> ${countryData.nome_pais_int}</p>
+                `;
+        } else {
+          countryDataDiv.innerHTML +=
+            "<p>Dados não disponíveis para o país selecionado.</p>";
+        }
+      }
+    </script>
+  </body>
+</html>

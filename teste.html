@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Requests</title>
+  </head>
+  <body>
+    <button onclick="fetchWithPromiseAny()">Promise.any</button>
+    <button onclick="fetchWithPromiseRace()">Promise.race</button>
+    <button onclick="fetchWithPromiseAll()">Promise.all</button>
+
+    <script>
+      async function fetchData(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data from ${url}`);
+        }
+        return response.json();
+      }
+
+      async function destructuringExample() {
+        const data = { name: "John", age: 25 };
+        const { name, age } = data;
+        console.log(`Name: ${name}, Age: ${age}`);
+      }
+
+      async function mapExample() {
+        try {
+          const data = await fetchData(
+            "https://jsonplaceholder.typicode.com/posts"
+          );
+          const mappedData = data.map((item) => item.title);
+          console.log("Mapped Data:", mappedData);
+        } catch (error) {
+          console.error("Map Example Error:", error);
+        }
+      }
+
+      async function filterExample() {
+        try {
+          const data = await fetchData(
+            "https://jsonplaceholder.typicode.com/todos"
+          );
+          const filteredData = data.filter((item) => item.completed);
+          console.log("Filtered Data:", filteredData);
+        } catch (error) {
+          console.error("Filter Example Error:", error);
+        }
+      }
+
+      async function reduceExample() {
+        try {
+          const data = await fetchData(
+            "https://jsonplaceholder.typicode.com/users"
+          );
+          const reducedData = data.reduce((accumulator, currentValue) => {
+            accumulator[currentValue.id] = currentValue.name;
+            return accumulator;
+          }, {});
+          console.log("Reduced Data:", reducedData);
+        } catch (error) {
+          console.error("Reduce Example Error:", error);
+        }
+      }
+
+      async function fetchWithPromiseAny() {
+        try {
+          const urls = [
+            "https://jsonplaceholder.typicode.com/posts/1",
+            "https://jsonplaceholder.typicode.com/posts/2",
+            "https://jsonplaceholder.typicode.com/posts/3",
+          ];
+          const result = await Promise.any(urls.map((url) => fetchData(url)));
+          console.log("Promise.any Result:", result);
+        } catch (error) {
+          console.error("Promise.any Error:", error);
+        }
+      }
+
+      async function fetchWithPromiseRace() {
+        try {
+          const urls = [
+            "https://jsonplaceholder.typicode.com/photos/1",
+            "https://jsonplaceholder.typicode.com/photos/2",
+            "https://jsonplaceholder.typicode.com/photos/3",
+          ];
+          const result = await Promise.race(urls.map((url) => fetchData(url)));
+          console.log("Promise.race Result:", result);
+        } catch (error) {
+          console.error("Promise.race Error:", error);
+        }
+      }
+
+      async function fetchWithPromiseAll() {
+        try {
+          const urls = [
+            "https://jsonplaceholder.typicode.com/comments/1",
+            "https://jsonplaceholder.typicode.com/comments/2",
+            "https://jsonplaceholder.typicode.com/comments/3",
+          ];
+          const results = await Promise.all(urls.map((url) => fetchData(url)));
+          console.log("Promise.all Results:", results);
+        } catch (error) {
+          console.error("Promise.all Error:", error);
+        }
+      }
+
+      // Chame as funções desejadas aqui
+      destructuringExample();
+      mapExample();
+      filterExample();
+      reduceExample();
+    </script>
+  </body>
+</html>
