@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f8ff;
+        text-align: center;
+        margin: 50px;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+      }
+
+      button {
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      #resultContainer {
+        margin-top: 20px;
+      }
+
+      .resultItem {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+    <title>Site com Promises e Fetch</title>
+  </head>
+
+  <body>
+    <h1>Exemplo de Site com Promises e Fetch</h1>
+
+    <div class="container">
+      <button id="btnPromiseAllSettled">Promise.all</button>
+      <button id="btnPromiseAny">Promise.any</button>
+      <button id="btnPromiseRace">Promise.race</button>
+      <div id="resultContainer"></div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const resultContainer = document.getElementById("resultContainer");
+
+        document
+          .getElementById("btnPromiseAllSettled")
+          .addEventListener("click", fetchWithPromiseAllSettled);
+
+        document
+          .getElementById("btnPromiseAny")
+          .addEventListener("click", fetchWithPromiseAny);
+
+        document
+          .getElementById("btnPromiseRace")
+          .addEventListener("click", fetchWithPromiseRace);
+
+        document
+          .getElementById("btnPromiseAll")
+          .addEventListener("click", fetchWithPromiseAll);
+
+        async function fetchWithPromiseAllSettled() {
+          resultContainer.innerHTML = "";
+          const apiUrl1 = "https://parallelum.com.br/fipe/api/v1/carros/marcas";
+          const apiUrl2 = "https://api.spacexdata.com/v5/launches/latest";
+          const apiUrl3 = "https://anapioficeandfire.com/api/characters/583";
+
+          try {
+            const results = await Promise.allSettled([
+              fetch(apiUrl1).then((response) => response.json()),
+              fetch(apiUrl2).then((response) => response.json()),
+              fetch(apiUrl3).then((response) => response.json()),
+            ]);
+
+            displayResults(results, [
+              "API Marcas",
+              "API SpaceX",
+              "API Character",
+            ]);
+          } catch (error) {
+            resultContainer.innerHTML = `<p>Erro ao acessar APIs (Promise.allSettled): ${error.message}</p>`;
+          }
+        }
+
+        async function fetchWithPromiseAny() {
+          resultContainer.innerHTML = "";
+          const apiUrl1 = "https://parallelum.com.br/fipe/api/v1/carros/marcas";
+          const apiUrl2 = "https://api.spacexdata.com/v5/launches/latest";
+          const apiUrl3 = "https://anapioficeandfire.com/api/characters/583";
+
+          try {
+            const result = await Promise.any([
+              fetch(apiUrl1).then((response) => response.json()),
+              fetch(apiUrl2).then((response) => response.json()),
+              fetch(apiUrl3).then((response) => response.json()),
+            ]);
+
+            displayResult(result, "API Promisse.any");
+          } catch (error) {
+            resultContainer.innerHTML = `<p>Erro ao acessar APIs (Promise.any): ${error.message}</p>`;
+          }
+        }
+
+        async function fetchWithPromiseRace() {
+          resultContainer.innerHTML = "";
+          const apiUrl1 = "https://parallelum.com.br/fipe/api/v1/carros/marcas";
+          const apiUrl2 = "https://api.spacexdata.com/v5/launches/latest";
+          const apiUrl3 = "https://anapioficeandfire.com/api/characters/583";
+
+          try {
+            const result = await Promise.race([
+              fetch(apiUrl1).then((response) => response.json()),
+              fetch(apiUrl2).then((response) => response.json()),
+              fetch(apiUrl3).then((response) => response.json()),
+            ]);
+
+            displayResult(result, "API Promisse.race");
+          } catch (error) {
+            resultContainer.innerHTML = `<p>Erro ao acessar APIs (Promise.race): ${error.message}</p>`;
+          }
+        }
+
+        async function fetchWithPromiseAll() {
+          resultContainer.innerHTML = "";
+          const apiUrl1 = "https://parallelum.com.br/fipe/api/v1/carros/marcas";
+          const apiUrl2 = "https://api.spacexdata.com/v5/launches/latest";
+          const apiUrl3 = "https://anapioficeandfire.com/api/characters/583";
+
+          try {
+            const results = await Promise.all([
+              fetch(apiUrl1).then((response) => response.json()),
+              fetch(apiUrl2).then((response) => response.json()),
+              fetch(apiUrl3).then((response) => response.json()),
+            ]);
+
+            displayResults(results, [
+              "API Marcas",
+              "API SpaceX",
+              "API Character",
+            ]);
+          } catch (error) {
+            resultContainer.innerHTML = `<p>Erro ao acessar APIs (Promise.all): ${error.message}</p>`;
+          }
+        }
+
+        function displayResults(results, labels) {
+          results.forEach((result, index) => {
+            const resultItem = document.createElement("div");
+            resultItem.classList.add("resultItem");
+            if (result.status === "fulfilled") {
+              resultItem.innerHTML = `<p>${
+                labels[index]
+              }</p><p>Resultado: ${JSON.stringify(result.value)}</p>`;
+            } else {
+              resultItem.innerHTML = `<p>${labels[index]}</p><p>Erro: ${result.reason.message}</p>`;
+            }
+            resultContainer.appendChild(resultItem);
+          });
+        }
+
+        function displayResult(result, label) {
+          const resultItem = document.createElement("div");
+          resultItem.classList.add("resultItem");
+          if (result) {
+            resultItem.innerHTML = `<p>${label}</p><p>Resultado: ${JSON.stringify(result)}</p>`;
+          } else {
+            resultItem.innerHTML = `<p>${label}</p><p>Nenhuma promessa foi resolvida.</p>`;
+          }
+          resultContainer.appendChild(resultItem);
+        }
+      });
+    </script>
+  </body>
+</html
