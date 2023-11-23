@@ -15,6 +15,16 @@
         align-items: center;
       }
 
+      p {
+        margin: 10px 0;
+      }
+      #link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
       .container {
         max-width: 800px;
         margin: 20px auto;
@@ -99,12 +109,12 @@
       </select>
       <button onclick="consultarDados()">Confirmar</button>
       <div id="dadosContainer"></div>
-      <p>
-        link para o exercício 4: <br />
-        <a href="index4.html">exercício 4</a>
-      </p>
-
     </div>
+
+    <p>
+      link para o exercício 4: <br />
+      <a href="index4.html">exercício 3</a>
+    </p>
     <script>
       async function consultarDados() {
         const select = document.getElementById("metadataSelect");
