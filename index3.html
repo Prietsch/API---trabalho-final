@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercício 3</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #4caf4fc7;
+        display: block;
+        justify-content: center;
+        align-items: center;
+      }
+
+      p {
+        margin: 10px 0;
+      }
+      #link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #fff;
+      }
+
+      label,
+      select {
+        display: block;
+        margin-bottom: 10px;
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      #dadosContainer {
+        margin-top: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: #fff;
+      }
+
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        margin-top: 20px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <label for="metadataSelect">Escolha o tipo de metadado:</label>
+      <select id="metadataSelect">
+        <option value="PPM_OVOS">PRODUÇÃO DE OVOS</option>
+        <option value="PPM_EFQUSU">PRODUÇÃO DE CARNES SUÍNA</option>
+        <option value="ABATE12_ABPENO12">ABATE NOVILHOS</option>
+      </select>
+      <button onclick="consultarDados()">Confirmar</button>
+      <div id="dadosContainer"></div>
+    </div>
+
+    <div id="link">
+      <p>
+        link para o exercício 4: <br />
+        <a href="index4.html">exercício 4</a>
+      </p>
+    </div>
+    <script>
+      async function consultarDados() {
+        const select = document.getElementById("metadataSelect");
+        const selectedOption = select.value;
+        const apiEndpoint = `http://www.ipeadata.gov.br/api/odata4/Metadados('${selectedOption}')`;
+        const dadosContainer = document.getElementById("dadosContainer");
+
+        // Limpar o conteúdo anterior
+        dadosContainer.innerHTML = "";
+
+        try {
+          // Consultar API para obter SERNOME e SERCOMENTARIO
+          const response = await fetch(apiEndpoint);
+          const data = await response.json();
+          const serNome = data.value[0].SERNOME;
+          const serComentario = data.value[0].SERCOMENTARIO;
+
+          // Exibir SERNOME e SERCOMENTARIO na tela
+          dadosContainer.innerHTML += `<p>Nome: ${serNome}</p>`;
+
+          // Consultar API para obter os dados da tabela
+          const responseDados = await fetch(`${apiEndpoint}/Valores/`);
+          const dataDados = await responseDados.json();
+
+          // Gerar tabela com os dados
+          const tableHTML = generateTable(dataDados.value);
+
+          // Exibir a tabela na tela
+          dadosContainer.innerHTML += tableHTML;
+        } catch (error) {
+          console.error("Erro:", error);
+        }
+      }
+
+      function generateTable(data) {
+        let tableHTML =
+          "<table><tr><th>Ano</th><th>Quantidade Produzida</th></tr>";
+
+        // Preencher as linhas da tabela com os dados
+        data.forEach((item) => {
+          const ano = item.VALDATA.split("T")[0].split("-")[0];
+          const quantidade =
+            item.VALVALOR !== null ? item.VALVALOR : "Não computado";
+
+          tableHTML += `<tr><td>${ano}</td><td>${quantidade}</td></tr>`;
+        });
+
+        tableHTML += "</table>";
+
+        return tableHTML;
+      }
+    </script>
+  </body>
+</html>
